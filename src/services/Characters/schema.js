@@ -4,52 +4,28 @@ const { Schema, model } = Mongoose;
 const characterSchema = new Schema (
     {
 editors: [ { type: Schema.Types.ObjectId, ref: 'User' } ],
-characterName: { type: String},
-race: { type: String},
-experience: { type: Number},
-class: { type: String },
-level: { type: String },
-armorClass: { type: String},
-attackBonus: { type: String},
-abilities: [ {
-     abilityName: String,
-     details: String,
- } ],
-hitPoints: { 
-    maxHitPoints: Number,
-    currentHitPoints: Number,
-},
-money: { 
-    pp: Number,
-    gp: Number,
-    sp: Number,
-    cp: Number
-    },
-characterImage:{ type: String },
-equipment: [{ 
-    equipmentName: String,
-    type: String,
-    damage: String,
-    armorClass: String,
-    armorBonus: String,
-    information: String,
-    weight: Number,
-} ],
-savingThrows: { 
-    deathPoison: Number,
-    wands: Number,        
-    paralysisPetrification: Number,        
-    dragonBreath: Number,        
-    spells: Number,         
-    },
-statistics: { 
-    strength: Number,
-    dexterity: Number,        
-    constitution: Number,        
-    wisdom: Number,        
-    intelligence: Number,        
-    charisma: Number,        
-    },
+avatar: {type: String},
+characterName: { type: String, required: true},
+skill: { type: String },
+style: { type: String },
+moxie: { type: Number },
+smarts: { type: Number },
+wiggles: { type: Number },
+friends: { type: Number },
+pockets: { type: Number },
+gumption: { currentGumption: {type: Number},
+            maxGumption: {type:Number, default: 6} 
+        },
+ailments: { 
+    shaken: {type: Boolean, default: false},
+    stressed: {type: Boolean, default: false},
+    frustrated: {type: Boolean, default: false},
+    confused: {type: Boolean, default: false},
+    frightened: {type: Boolean, default: false},
+    exhausted: {type: Boolean, default: false},
+        },
+grit: {
+    type: Number, default: 0}
 },
  { timestamps: true }
 )

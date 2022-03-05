@@ -39,6 +39,7 @@ usersRouter
       const usersCharacters = await CharacterModel.find({editors: req.user._id})
       req.user.characters = usersCharacters
       await res.send(req.user);
+
     } else {
       next(createHttpError(404, `User with the ${id} not found!`));
     }

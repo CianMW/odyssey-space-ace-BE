@@ -26,44 +26,7 @@ characterRouter
 .post("/", authorizationMiddle, async (req, res, next) => {
   try {
 
-  const randomName = FCG.Names.generate();
-      const body = {
-          editors : [req.user._id],
-          characterName : randomName.name,
-          race : "",
-          experience : 0,
-          class : "",
-          level : 1,
-          armorClass : 10,
-          attackBonus : 1,
-          hitPoints: {
-              maxHitPoints: 0,
-              currentHitPoints: 0,
-          },
-          money: {
-            pp: 0,
-            gp: 0,
-            sp: 0,
-            cp: 0
-          },
-          savingThrows: {
-            deathPoison: 0,
-            wands: 0,        
-            paralysisPetrification: 0,        
-            dragonBreath: 0,        
-            spells: 0, 
-          },
-          statistics: {
-            strength: 10,
-            dexterity: 10,        
-            constitution: 10,        
-            wisdom: 10,        
-            intelligence: 10,        
-            charisma: 10,  
-          }
-      }
-
-    const newCharacter = new CharacterModel(body);
+    const newCharacter = new CharacterModel(req.body);
     const { _id } = await newCharacter.save();
 
       res.status(201).send({_id});    

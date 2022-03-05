@@ -23,7 +23,7 @@ userSchema.statics.checkCredentials = async function (email, plainPW) {
     console.log("pw:",plainPW)
     //finds user by email
     //if user => compare PWs 
-    const user = await this.findOne({email: email}).populate({path: "games"})  
+    const user = await this.findOne({email: email}).populate({path:"games", populate:{path:"characters"}}) 
   
     if (user) {
         const passwordMatch = await bcrypt.compare(plainPW, user.password)
