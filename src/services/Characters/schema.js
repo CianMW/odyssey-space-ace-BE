@@ -3,6 +3,7 @@ const { Schema, model } = Mongoose;
 
 const characterSchema = new Schema (
     {
+owner: { type: Schema.Types.ObjectId, ref: 'User' } ,
 editors: [ { type: Schema.Types.ObjectId, ref: 'User' } ],
 avatar: {type: String},
 characterName: { type: String, required: true},

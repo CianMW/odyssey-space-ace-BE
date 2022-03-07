@@ -27,9 +27,17 @@ characterRouter
   try {
 
     const newCharacter = new CharacterModel(req.body);
+    req.body.owner = req.user._id
     const { _id } = await newCharacter.save();
+    if (_id) {
+      const savedChar = await CharacterModel.findById(_id)
+      if (savedChar) {
+        savedChar.editors.push(req.user._id)
+        await savedChar.save()
+        res.status(201).send({_id});    
+      }
+    }
 
-      res.status(201).send({_id});    
   } catch(error) {
     console.log(error)
       res.status(400).send(error)
