@@ -4,6 +4,25 @@ import authorizationMiddle from "../../middlewares/authorization.js";
 import { gameOwnerAuth } from "../../middlewares/gameOwnerAuth.js";
 import CharacterModel from "./schema.js"
 import FCG from "fantasy-content-generator";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import multer from "multer";
+
+
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET 
+})
+
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "space-aces-characters",
+  },
+});
+
 
 const characterRouter = express.Router() 
 
@@ -27,7 +46,8 @@ characterRouter
   try {
 
     const newCharacter = new CharacterModel(req.body);
-    req.body.owner = req.user._id
+    newCharacter.owner = req.user._id
+    newCharacter.avatar = `https://robohash.org/${req.body.characterName}`
     const { _id } = await newCharacter.save();
     if (_id) {
       const savedChar = await CharacterModel.findById(_id)
@@ -41,6 +61,25 @@ characterRouter
   } catch(error) {
     console.log(error)
       res.status(400).send(error)
+  }
+  })
+
+  .put("/:id/upload", multer({ storage: cloudinaryStorage }).single("image"),
+  async (req, res, next) => {
+    try {
+    console.log("this is the cloudinary api" , process.env.CLOUDINARY_URL)
+    if(req.file) {
+      const character = await CharacterModel.findById(req.params.id)
+      character.avatar = req.file.path
+      const addFileUrl = await character.save()
+      res.send(addFileUrl)
+    } else {
+      console.log(error)
+      res.send("Database Error Saving File")
+    }
+  } catch(error) {
+    console.log(error)
+    res.send("Error uploading file")
   }
   })
 

@@ -17,12 +17,15 @@ io.on("connection", (socket) => {
     socket.on("joinRoom" , (gameId, username) => {
 
         console.log(`this is the room ${gameId}`)
-        inGameUsers.push({ username: username, socketId: socket.id, room: gameId })
-    console.log("currently connected on join", inGameUsers)
-        
-        socket.join(gameId)
-        console.log(socket.rooms)
-        socket.to(gameId).emit("newConnection")
+        if (inGameUsers.filter(user => user.username === username).length <= 0 ) {
+
+            inGameUsers.push({ username: username, socketId: socket.id, room: gameId })
+            console.log("currently connected on join", inGameUsers)
+            
+            socket.join(gameId)
+            console.log(socket.rooms)
+            socket.to(gameId).emit("newConnection")
+        }
     })
     
     // socket.emit("loggedin")
