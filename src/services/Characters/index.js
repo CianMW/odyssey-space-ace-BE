@@ -63,6 +63,25 @@ characterRouter
       res.status(400).send(error)
   }
   })
+  .put("/:characterId", authorizationMiddle, async (req, res, next) => {
+
+    const { characterId } = req.params;
+    try {
+      const updatedCharacter = await CharacterModel.findByIdAndUpdate(
+        characterId,
+        req.body,
+        { new: true }
+      );
+  
+      if (updatedCharacter) {
+        res.send(updatedCharacter);
+      } else {
+        next(createHttpError(404, `User with the id: ${characterId} not found!`));
+      }
+    } catch (error) {
+      next(error);
+    }
+  })
 
   .put("/:id/upload", multer({ storage: cloudinaryStorage }).single("image"),
   async (req, res, next) => {

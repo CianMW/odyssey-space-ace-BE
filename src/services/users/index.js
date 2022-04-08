@@ -50,7 +50,7 @@ usersRouter
 
   //=====================================================================  
 
-
+  
 // The user can get their own details
 .get("/me", authorizationMiddle, async (req, res, next) => {
   try {

@@ -14,7 +14,7 @@ smarts: { type: Number },
 wiggles: { type: Number },
 friends: { type: Number },
 pockets: { type: Number },
-gumption: { currentGumption: {type: Number},
+gumption: { currentGumption: {type: Number, default: 6},
             maxGumption: {type:Number, default: 6} 
         },
 ailments: { 
@@ -26,7 +26,12 @@ ailments: {
     exhausted: {type: Boolean, default: false},
         },
 grit: {
-    type: Number, default: 0}
+    firstGrit: {type: Boolean, default: false},
+    secondGrit: {type: Boolean, default: false},
+    thirdGrit: {type: Boolean, default: false},
+    fourthGrit: {type: Boolean, default: false},
+    fifthGrit: {type: Boolean, default: false},
+}
 },
  { timestamps: true }
 )
