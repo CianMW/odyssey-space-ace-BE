@@ -51,7 +51,7 @@ userSchema.statics.checkCredentials = async function (email, plainPW) {
         console.log("got this far")
       newUser.password = hash;
     } else {
-        console.log("This fucking code doesn't work")
+        console.log("This didn't work")
     }
 
     console.log("after the hash: ", newUser)
