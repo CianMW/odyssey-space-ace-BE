@@ -28,6 +28,17 @@ gamesRouter
       const body = req.body
       console.log("THIS IS THE BODY", body)
       req.body.ownerId = req.user._id
+
+      let playerIds = []
+      for (let i = 0; i < req.body.players.length; i++){
+        let userId = await UserModel.find({email: req.body.players[i]})
+        console.log("found Player!!!", userId)
+        if (userId.length > 0) {
+          playerIds.push(userId[0]._id)
+
+        }
+      }
+      req.body.players = playerIds
     const newGame = new GameModel(body);
     const { _id } = await newGame.save();
     if (_id) {
@@ -137,6 +148,28 @@ gamesRouter
       res.send(updatedGame);
     } else {
       next(createHttpError(404, `User with the id: ${id} not found!`));
+    }
+  } catch (error) {
+    next(error);
+  }
+})
+
+// Add Character to game
+.put("/:gameId/addCharacter/:characterId", authorizationMiddle, gameOwnerAuth, async (req, res, next) => {
+  try {
+    const gameId = req.params.gameId;
+    const characterId = req.params.characterId;
+
+    const foundGame = await GameModel.findById(gameId);
+    if (foundGame) {
+      foundGame.characters.push(characterId)
+      const updatedGame = await foundGame.save();
+  
+      if (updatedGame) {
+        res.send(updatedGame);
+      } else {
+        next(createHttpError(404, `User with the id: ${id} not found!`));
+      }
     }
   } catch (error) {
     next(error);

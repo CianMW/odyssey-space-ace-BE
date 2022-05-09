@@ -7,6 +7,7 @@ const { Schema, model } = mongoose;
 const userSchema = new Schema (
     {
 name: { type: String, required: true },
+avatar: { type: String },
 email: { type: String, required: true },
 surname: { type: String, required: true },
 password: { type: String, required: true },
@@ -23,7 +24,7 @@ userSchema.statics.checkCredentials = async function (email, plainPW) {
     console.log("pw:",plainPW)
     //finds user by email
     //if user => compare PWs 
-    const user = await this.findOne({email: email}).populate({path: "games"})  
+    const user = await this.findOne({email: email}).populate({path:"games", populate:{path:"characters"}}) 
   
     if (user) {
         const passwordMatch = await bcrypt.compare(plainPW, user.password)
@@ -50,7 +51,7 @@ userSchema.statics.checkCredentials = async function (email, plainPW) {
         console.log("got this far")
       newUser.password = hash;
     } else {
-        console.log("This fucking code doesn't work")
+        console.log("This didn't work")
     }
 
     console.log("after the hash: ", newUser)

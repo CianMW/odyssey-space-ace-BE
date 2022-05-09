@@ -4,6 +4,25 @@ import authorizationMiddle from "../../middlewares/authorization.js";
 import { gameOwnerAuth } from "../../middlewares/gameOwnerAuth.js";
 import CharacterModel from "./schema.js"
 import FCG from "fantasy-content-generator";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import multer from "multer";
+
+
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET 
+})
+
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "space-aces-characters",
+  },
+});
+
 
 const characterRouter = express.Router() 
 
@@ -26,50 +45,60 @@ characterRouter
 .post("/", authorizationMiddle, async (req, res, next) => {
   try {
 
-  const randomName = FCG.Names.generate();
-      const body = {
-          editors : [req.user._id],
-          characterName : randomName.name,
-          race : "",
-          experience : 0,
-          class : "",
-          level : 1,
-          armorClass : 10,
-          attackBonus : 1,
-          hitPoints: {
-              maxHitPoints: 0,
-              currentHitPoints: 0,
-          },
-          money: {
-            pp: 0,
-            gp: 0,
-            sp: 0,
-            cp: 0
-          },
-          savingThrows: {
-            deathPoison: 0,
-            wands: 0,        
-            paralysisPetrification: 0,        
-            dragonBreath: 0,        
-            spells: 0, 
-          },
-          statistics: {
-            strength: 10,
-            dexterity: 10,        
-            constitution: 10,        
-            wisdom: 10,        
-            intelligence: 10,        
-            charisma: 10,  
-          }
-      }
-
-    const newCharacter = new CharacterModel(body);
+    const newCharacter = new CharacterModel(req.body);
+    newCharacter.owner = req.user._id
+    newCharacter.avatar = `https://robohash.org/${req.body.characterName}`
     const { _id } = await newCharacter.save();
+    if (_id) {
+      const savedChar = await CharacterModel.findById(_id)
+      if (savedChar) {
+        savedChar.editors.push(req.user._id)
+        await savedChar.save()
+        res.status(201).send({_id});    
+      }
+    }
 
-      res.status(201).send({_id});    
   } catch(error) {
     console.log(error)
       res.status(400).send(error)
+  }
+  })
+  .put("/:characterId", authorizationMiddle, async (req, res, next) => {
+
+    const { characterId } = req.params;
+    try {
+      const updatedCharacter = await CharacterModel.findByIdAndUpdate(
+        characterId,
+        req.body,
+        { new: true }
+      );
+  
+      if (updatedCharacter) {
+        res.send(updatedCharacter);
+      } else {
+        next(createHttpError(404, `User with the id: ${characterId} not found!`));
+      }
+    } catch (error) {
+      next(error);
+    }
+  })
+
+  .put("/:id/upload", multer({ storage: cloudinaryStorage }).single("image"),
+  async (req, res, next) => {
+    try {
+    console.log("this is the cloudinary api" , process.env.CLOUDINARY_URL)
+    if(req.file) {
+      const character = await CharacterModel.findById(req.params.id)
+      character.avatar = req.file.path
+      const addFileUrl = await character.save()
+      res.send(addFileUrl)
+    } else {
+      console.log(error)
+      res.send("Database Error Saving File")
+    }
+  } catch(error) {
+    console.log(error)
+    res.send("Error uploading file")
   }
   })
 
